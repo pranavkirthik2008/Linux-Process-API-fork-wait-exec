@@ -27,7 +27,20 @@ Test the C Program for the desired output.
 
 
 
+#include <stdio.h> #include <stdlib.h> #include <unistd.h>
 
+int main() { int pid = fork();
+
+if (pid == 0) { 
+    printf("I am child, my PID is %d\n", getpid()); 
+    printf("My parent PID is: %d\n", getppid()); 
+    sleep(2);  // Keep child alive for verification
+} else { 
+    printf("I am parent, my PID is %d\n", getpid()); 
+    wait(NULL); 
+}
+
+}
 
 
 
@@ -38,6 +51,7 @@ Test the C Program for the desired output.
 
 
 ##OUTPUT
+<img width="356" height="124" alt="image" src="https://github.com/user-attachments/assets/77b530d1-104b-4131-91a8-077e086158c3" />
 
 
 
@@ -52,7 +66,42 @@ Test the C Program for the desired output.
 
 
 
+#include <stdio.h> #include <stdlib.h> #include <sys/types.h> #include <sys/wait.h> #include <unistd.h>
 
+int main() { int status;
+
+printf("Running ps with execl\n");
+if (fork() == 0) {
+    execl("ps", "ps", "-f", NULL);
+    perror("execl failed");
+    exit(1);
+}
+wait(&status);
+{
+if (WIFEXITED(status)) {
+    printf("Child exited with status: %d\n", WEXITSTATUS(status));
+} else {
+    printf("Child did not exit successfully\n");
+}
+{
+printf("Running ps with execlp (without full path)\n");
+if (fork() == 0) {
+    execlp("ps", "ps", "-f", NULL);
+    perror("execlp failed");
+    exit(1);
+}
+wait(&status);
+{
+if (WIFEXITED(status)) {
+    printf("Child exited for execlp with status: %d\n", WEXITSTATUS(status));
+} else {
+    printf("Child did not exit successfully\n");
+}
+{
+printf("Done.\n");
+return 0;
+
+}
 
 
 
@@ -76,6 +125,7 @@ Test the C Program for the desired output.
 ##OUTPUT
 
 
+<img width="666" height="312" alt="image" src="https://github.com/user-attachments/assets/09c034ff-9e1f-4164-8acf-625b474fd7ee" />
 
 
 
